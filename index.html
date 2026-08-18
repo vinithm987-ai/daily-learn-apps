@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NexusAI - Next-Gen AI Learning Platform</title>
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Ambient Gradient Background Orbs -->
+  <div class="ambient-glow orb-1"></div>
+  <div class="ambient-glow orb-2"></div>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="logo">
+      <i class="fa-solid fa-brain-circuit neon-icon"></i>
+      <span>Nexus<strong>AI</strong></span>
+    </div>
+
+    <nav class="nav-links">
+      <button class="nav-item active" data-view="home"><i class="fa-solid fa-house"></i> Home</button>
+      <button class="nav-item" data-view="dashboard"><i class="fa-solid fa-chart-line"></i> Dashboard</button>
+      <button class="nav-item" data-view="ai-assistant"><i class="fa-solid fa-robot"></i> AI Assistant</button>
+      <button class="nav-item" data-view="quiz-center"><i class="fa-solid fa-bolt"></i> Quiz Center</button>
+      <button class="nav-item" data-view="vocab-hub"><i class="fa-solid fa-book-open"></i> Vocabulary</button>
+    </nav>
+
+    <div class="nav-actions">
+      <button id="theme-toggle" class="icon-btn" title="Toggle Theme"><i class="fa-solid fa-moon"></i></button>
+      <button id="open-auth-btn" class="btn btn-primary"><i class="fa-solid fa-user-lock"></i> Sign In</button>
+      <div id="user-profile" class="user-badge hidden">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Avatar" id="user-avatar" />
+        <span id="user-name">Alex M.</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Multi-View Workspace -->
+  <main class="main-container">
+
+    <!-- View 1: Cinematic Home / Hero -->
+    <section id="view-home" class="page-view active">
+      <div class="hero-section">
+        <div class="hero-badge"><i class="fa-solid fa-sparkles"></i> Powered by Gemini 2.0</div>
+        <h1 class="hero-title">Master Any Subject with <span class="gradient-text">Adaptive AI</span></h1>
+        <p class="hero-subtitle">Real-time tutoring, interactive quizzes, automated lesson generation, and instant feedback tailored precisely to your pace.</p>
+        
+        <div class="hero-cta-group">
+          <button class="btn btn-primary btn-glow" onclick="switchView('ai-assistant')">Launch AI Tutor <i class="fa-solid fa-arrow-right"></i></button>
+          <button class="btn btn-secondary" onclick="switchView('dashboard')">View Progress</button>
+        </div>
+
+        <div class="feature-grid">
+          <div class="glass-card">
+            <div class="card-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+            <h3>AI Lesson Builder</h3>
+            <p>Generate deep-dive curricula on any subject from physics to financial analysis.</p>
+          </div>
+          <div class="glass-card">
+            <div class="card-icon"><i class="fa-solid fa-microphone-lines"></i></div>
+            <h3>Voice Tutor</h3>
+            <p>Practice speaking and interactive debate with natural neural speech synthesis.</p>
+          </div>
+          <div class="glass-card">
+            <div class="card-icon"><i class="fa-solid fa-trophy"></i></div>
+            <h3>Smart Quizzes</h3>
+            <p>Adaptive problem sets that detect your weak points and adjust in real time.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- View 2: Student Dashboard -->
+    <section id="view-dashboard" class="page-view">
+      <div class="section-header">
+        <h2>Student Dashboard</h2>
+        <span class="badge-accent">Level 8 Scholar</span>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="stats-row">
+        <div class="stat-card glass-card">
+          <i class="fa-solid fa-bolt text-warning"></i>
+          <div>
+            <div class="stat-value" id="stat-streak">14 Days</div>
+            <div class="stat-label">Daily Streak</div>
+          </div>
+        </div>
+        <div class="stat-card glass-card">
+          <i class="fa-solid fa-star text-info"></i>
+          <div>
+            <div class="stat-value" id="stat-xp">3,450 XP</div>
+            <div class="stat-label">Total Earned</div>
+          </div>
+        </div>
+        <div class="stat-card glass-card">
+          <i class="fa-solid fa-circle-check text-success"></i>
+          <div>
+            <div class="stat-value" id="stat-quizzes">28</div>
+            <div class="stat-label">Quizzes Cleared</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Tracking & Quests -->
+      <div class="dashboard-grid">
+        <div class="glass-card full-span">
+          <h3>Daily XP Target</h3>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" style="width: 70%;"></div>
+          </div>
+          <div class="progress-info">
+            <span>350 / 500 XP Today</span>
+            <span>70%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- View 3: Gemini AI Assistant / Tutor -->
+    <section id="view-ai-assistant" class="page-view">
+      <div class="chat-wrapper glass-card">
+        <div class="chat-header">
+          <div class="chat-avatar"><i class="fa-solid fa-sparkles"></i></div>
+          <div>
+            <h3>Gemini Academic Tutor</h3>
+            <span class="status-online">Online & Ready</span>
+          </div>
+        </div>
+
+        <div id="chat-messages" class="chat-body">
+          <div class="message assistant">
+            <div class="bubble">Hello Alex! What topic or problem would you like to explore today? I can explain concepts, write code, or test your knowledge.</div>
+          </div>
+        </div>
+
+        <form id="chat-form" class="chat-footer">
+          <input type="text" id="chat-input" placeholder="Ask anything (e.g., 'Explain the DuPont formula' or 'Debug this Python script')..." autocomplete="off" required />
+          <button type="button" id="voice-btn" class="icon-btn" title="Voice Input"><i class="fa-solid fa-microphone"></i></button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i></button>
+        </form>
+      </div>
+    </section>
+
+    <!-- View 4: AI Quiz Center -->
+    <section id="view-quiz-center" class="page-view">
+      <div class="glass-card">
+        <h2>AI Adaptive Quiz Engine</h2>
+        <p class="subtitle">Generate an interactive quiz dynamically on any topic using Gemini.</p>
+        
+        <div class="quiz-controls">
+          <input type="text" id="quiz-topic" placeholder="Enter topic (e.g., Corporate Finance, Organic Chemistry)..." />
+          <button id="generate-quiz-btn" class="btn btn-primary"><i class="fa-solid fa-brain"></i> Generate Quiz</button>
+        </div>
+
+        <div id="quiz-container" class="quiz-display hidden">
+          <h4 id="quiz-question">Question text will appear here</h4>
+          <div id="quiz-options" class="options-grid"></div>
+          <div id="quiz-feedback" class="quiz-feedback-box hidden"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- View 5: Vocabulary Builder -->
+    <section id="view-vocab-hub" class="page-view">
+      <div class="glass-card">
+        <h2>Smart Vocabulary & Terminology Engine</h2>
+        <div class="vocab-search-row">
+          <input type="text" id="vocab-category" placeholder="Domain (e.g., Banking, Astrophysics, Medicine)..." />
+          <button id="generate-vocab-btn" class="btn btn-primary">Fetch Terms</button>
+        </div>
+        <div id="vocab-grid" class="vocab-cards-grid"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Auth Modal (Glassmorphism) -->
+  <div id="auth-modal" class="modal-overlay hidden">
+    <div class="modal-card glass-card">
+      <button class="modal-close" id="close-auth-btn">&times;</button>
+      <h3 id="auth-title">Welcome to NexusAI</h3>
+      <p class="subtitle">Sign in to save streaks, earn badges, and sync across devices.</p>
+      
+      <form id="auth-form">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="auth-email" placeholder="name@domain.com" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="auth-password" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn btn-primary full-width">Continue</button>
+      </form>
+      <div class="auth-divider"><span>OR</span></div>
+      <button class="btn btn-secondary full-width" id="google-auth-btn"><i class="fa-brands fa-google"></i> Continue with Google</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
