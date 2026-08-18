@@ -1,237 +1,1225 @@
-/* =========================================================
-   ALVIN AI - MAIN JAVASCRIPT
-   ========================================================= */
-
-const $ = id => document.getElementById(id);
-
-let currentUser = JSON.parse(localStorage.getItem("alvinUser")) || null;
-
-let stats = JSON.parse(localStorage.getItem("alvinStats")) || {
-  xp: 0,
-  streak: 1,
-  learned: 0,
-  quizCorrect: 0,
-  notes: 0
-};
-
-let notes = JSON.parse(localStorage.getItem("alvinNotes")) || [];
-
-let quizIndex = 0;
-let quizScore = 0;
-let quizAnswered = false;
-
-let flashIndex = 0;
+/* =====================================================
+   ALVIN AI
+   MAIN JAVASCRIPT
+===================================================== */
 
 
-/* =========================================================
-   100 VOCABULARY WORDS
-   ========================================================= */
+/* =====================================================
+   DOM ELEMENTS
+===================================================== */
 
-const vocabulary = [
-  ["Abundant","Existing in large quantities.","The company has abundant resources."],
-  ["Accurate","Correct and exact.","Please provide accurate information."],
-  ["Adapt","To change according to a situation.","We must adapt to change."],
-  ["Ambitious","Having strong goals.","She is ambitious about her career."],
-  ["Analyze","To examine carefully.","We need to analyze the data."],
-  ["Approach","A way of dealing with something.","We need a new approach."],
-  ["Assertive","Confident in expressing opinions.","He is an assertive speaker."],
-  ["Authentic","Real or genuine.","This is an authentic example."],
-  ["Benefit","An advantage or positive result.","Exercise has many benefits."],
-  ["Brief","Short in duration or length.","Give me a brief explanation."],
-  ["Capable","Having the ability to do something.","She is capable of leading the team."],
-  ["Collaborate","To work together.","We collaborate on projects."],
-  ["Commitment","A strong promise or dedication.","Success requires commitment."],
-  ["Communicate","To share information or ideas.","Good leaders communicate clearly."],
-  ["Compassion","Concern for others.","Compassion is important in leadership."],
-  ["Confident","Feeling sure about yourself.","He is confident during interviews."],
-  ["Consistent","Doing something regularly.","Be consistent with your practice."],
-  ["Creative","Able to produce new ideas.","She has a creative mind."],
-  ["Critical","Very important or involving careful judgment.","Critical thinking improves decisions."],
-  ["Curious","Wanting to learn more.","Curious students learn quickly."],
-  ["Decision","A choice made after thinking.","We made an important decision."],
-  ["Dedication","Strong effort and commitment.","Her dedication is impressive."],
-  ["Develop","To grow or improve.","Develop your communication skills."],
-  ["Effective","Producing the desired result.","This is an effective strategy."],
-  ["Efficient","Working well without wasting resources.","The process is efficient."],
-  ["Encourage","To give confidence or support.","Teachers encourage students."],
-  ["Essential","Absolutely necessary.","Communication is essential."],
-  ["Evaluate","To judge the quality or value.","Managers evaluate performance."],
-  ["Expand","To become larger.","The business plans to expand."],
-  ["Flexible","Able to change easily.","Be flexible at work."],
-  ["Focus","To concentrate on something.","Focus on your goals."],
-  ["Generate","To produce something.","The project can generate revenue."],
-  ["Growth","Development or increase.","The company achieved strong growth."],
-  ["Identify","To recognize or find.","Identify the main problem."],
-  ["Improve","To make something better.","Practice helps improve English."],
-  ["Innovative","Introducing new ideas.","The company uses innovative technology."],
-  ["Insight","A deep understanding.","The report provides useful insight."],
-  ["Integrity","Honesty and strong moral principles.","Integrity builds trust."],
-  ["Logical","Based on clear reasoning.","Use a logical approach."],
-  ["Maintain","To keep something in good condition.","Maintain a positive attitude."],
-  ["Motivate","To give someone a reason to act.","Good leaders motivate employees."],
-  ["Objective","A goal or purpose.","Our objective is growth."],
-  ["Opportunity","A favorable chance.","This is a great opportunity."],
-  ["Optimize","To make something as effective as possible.","We need to optimize the process."],
-  ["Perspective","A particular way of viewing something.","Consider another perspective."],
-  ["Potential","Possible future ability or success.","She has great potential."],
-  ["Precise","Exact and accurate.","Give a precise answer."],
-  ["Prioritize","To decide what is most important.","Prioritize important tasks."],
-  ["Proactive","Taking action before problems happen.","A proactive employee solves problems early."],
-  ["Productive","Producing useful results.","Today was very productive."],
-  ["Professional","Suitable for a workplace.","Use professional communication."],
-  ["Progress","Movement toward improvement.","You are making progress."],
-  ["Reliable","Able to be trusted.","He is a reliable employee."],
-  ["Resilient","Able to recover from difficulties.","She is resilient after failure."],
-  ["Resourceful","Good at solving problems.","He is a resourceful manager."],
-  ["Relevant","Closely connected to the topic.","Give relevant examples."],
-  ["Strategic","Related to long-term planning.","We need strategic thinking."],
-  ["Sustainable","Able to continue for a long time.","The company needs sustainable growth."],
-  ["Transparent","Open and easy to understand.","The company has a transparent policy."],
-  ["Transform","To change significantly.","Technology can transform business."],
-  ["Unique","One of a kind.","Every person has a unique skill."],
-  ["Valuable","Worth a lot or useful.","Experience is valuable."],
-  ["Versatile","Able to do many different things.","She is a versatile employee."],
-  ["Vision","A picture of a desired future.","The leader has a clear vision."],
-  ["Achieve","To successfully reach a goal.","Work hard to achieve your goals."],
-  ["Acquire","To gain or obtain.","The company acquired another business."],
-  ["Allocate","To distribute resources.","Managers allocate the budget."],
-  ["Assess","To evaluate something.","Assess the investment risk."],
-  ["Boost","To increase or improve.","Training can boost confidence."],
-  ["Clarify","To make something clear.","Please clarify your point."],
-  ["Competent","Having the necessary ability.","She is a competent analyst."],
-  ["Contribute","To give or add something.","Everyone can contribute ideas."],
-  ["Demonstrate","To show clearly.","Demonstrate your skills."],
-  ["Diverse","Including different types of people or things.","We need a diverse team."],
-  ["Enhance","To improve quality or value.","Education enhances career opportunities."],
-  ["Estimate","To roughly calculate.","Estimate the project cost."],
-  ["Facilitate","To make something easier.","Technology facilitates communication."],
-  ["Forecast","To predict future events.","Analysts forecast market growth."],
-  ["Implement","To put a plan into action.","The company implemented a new policy."],
-  ["Influence","The power to affect something.","Advertising influences consumers."],
-  ["Interpret","To explain the meaning of something.","Interpret the financial results."],
-  ["Invest","To put money into something for future benefit.","People invest for long-term growth."],
-  ["Manage","To control or organize.","Managers manage resources."],
-  ["Negotiate","To discuss to reach an agreement.","We negotiated a better price."],
-  ["Observe","To watch carefully.","Observe customer behavior."],
-  ["Participate","To take part in something.","Students participate in discussions."],
-  ["Predict","To say what may happen.","Experts predict economic growth."],
-  ["Recommend","To suggest something.","I recommend regular practice."],
-  ["Reduce","To make smaller or less.","Companies try to reduce costs."],
-  ["Resolve","To solve a problem.","We need to resolve the issue."],
-  ["Retain","To keep something.","Companies try to retain employees."],
-  ["Significant","Important or noticeable.","There was significant growth."],
-  ["Simplify","To make easier to understand.","Simplify the explanation."],
-  ["Specialize","To focus on a specific area.","She specializes in finance."],
-  ["Strengthen","To make stronger.","Training strengthens skills."],
-  ["Succeed","To achieve the desired result.","Hard work helps you succeed."],
-  ["Support","To help someone or something.","The team supports the project."],
-  ["Target","A specific goal or group.","Our target market is young professionals."],
-  ["Utilize","To use effectively.","Utilize your time wisely."],
-  ["Verify","To check that something is correct.","Verify the information."],
-  ["Withdraw","To take something back or remove.","The investor withdrew money."],
-  ["Yield","The return produced by an investment.","The bond offers a good yield."]
+const loader = document.getElementById("loader");
+
+const authOverlay = document.getElementById("authOverlay");
+const authForm = document.getElementById("authForm");
+const authTitle = document.getElementById("authTitle");
+const authSubtitle = document.getElementById("authSubtitle");
+const authButtonText = document.getElementById("authButtonText");
+
+const nameGroup = document.getElementById("nameGroup");
+const registerName = document.getElementById("registerName");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+
+const switchAuth = document.getElementById("switchAuth");
+const switchText = document.getElementById("switchText");
+
+const openProfile = document.getElementById("openProfile");
+const closeAuth = document.getElementById("closeAuth");
+
+const togglePassword =
+  document.getElementById("togglePassword");
+
+const themeBtn =
+  document.getElementById("themeBtn");
+
+const searchInput =
+  document.getElementById("searchInput");
+
+const searchBtn =
+  document.getElementById("searchBtn");
+
+const voiceBtn =
+  document.getElementById("voiceBtn");
+
+const answerSection =
+  document.getElementById("answerSection");
+
+const answerQuestion =
+  document.getElementById("answerQuestion");
+
+const answerText =
+  document.getElementById("answerText");
+
+const clearAnswer =
+  document.getElementById("clearAnswer");
+
+const speakBtn =
+  document.getElementById("speakBtn");
+
+const copyBtn =
+  document.getElementById("copyBtn");
+
+const historyList =
+  document.getElementById("historyList");
+
+const clearHistory =
+  document.getElementById("clearHistory");
+
+const toast =
+  document.getElementById("toast");
+
+const toastMessage =
+  document.getElementById("toastMessage");
+
+
+/* =====================================================
+   LOADING
+===================================================== */
+
+window.addEventListener("load", function () {
+
+  setTimeout(function () {
+
+    loader.classList.add("hide");
+
+  }, 700);
+
+});
+
+
+/* =====================================================
+   AUTH SYSTEM
+===================================================== */
+
+let loginMode = false;
+
+
+/* Open registration */
+
+openProfile.addEventListener("click", function () {
+
+  const currentUser =
+    localStorage.getItem("alvinUser");
+
+  if (currentUser) {
+
+    const user =
+      JSON.parse(currentUser);
+
+    showToast(
+      "Logged in as " + user.name
+    );
+
+    return;
+  }
+
+  loginMode = false;
+
+  updateAuthUI();
+
+  authOverlay.classList.remove("hidden");
+
+});
+
+
+/* Close */
+
+closeAuth.addEventListener("click", function () {
+
+  authOverlay.classList.add("hidden");
+
+});
+
+
+/* Switch login/register */
+
+switchAuth.addEventListener("click", function () {
+
+  loginMode = !loginMode;
+
+  updateAuthUI();
+
+});
+
+
+function updateAuthUI() {
+
+  if (loginMode) {
+
+    authTitle.textContent =
+      "Welcome back";
+
+    authSubtitle.textContent =
+      "Login to continue learning.";
+
+    authButtonText.textContent =
+      "Login";
+
+    switchText.textContent =
+      "Don't have an account?";
+
+    switchAuth.textContent =
+      "Register";
+
+    nameGroup.style.display =
+      "none";
+
+  } else {
+
+    authTitle.textContent =
+      "Welcome to ALVIN";
+
+    authSubtitle.textContent =
+      "Create your account and start learning.";
+
+    authButtonText.textContent =
+      "Create Account";
+
+    switchText.textContent =
+      "Already have an account?";
+
+    switchAuth.textContent =
+      "Login";
+
+    nameGroup.style.display =
+      "block";
+  }
+
+}
+
+
+/* Register / login */
+
+authForm.addEventListener("submit", function (event) {
+
+  event.preventDefault();
+
+  const email =
+    emailInput.value.trim();
+
+  const password =
+    passwordInput.value.trim();
+
+  const name =
+    registerName.value.trim();
+
+
+  if (!email || !password) {
+
+    showToast("Please enter email and password.");
+
+    return;
+  }
+
+
+  if (loginMode) {
+
+    const saved =
+      localStorage.getItem("alvinAccount");
+
+    if (!saved) {
+
+      showToast(
+        "No account found. Please register first."
+      );
+
+      return;
+    }
+
+    const account =
+      JSON.parse(saved);
+
+    if (
+      account.email !== email ||
+      account.password !== password
+    ) {
+
+      showToast(
+        "Incorrect email or password."
+      );
+
+      return;
+    }
+
+
+    localStorage.setItem(
+      "alvinUser",
+      JSON.stringify(account)
+    );
+
+    showToast("Login successful!");
+
+  } else {
+
+    if (!name) {
+
+      showToast("Please enter your name.");
+
+      return;
+    }
+
+
+    const account = {
+
+      name: name,
+
+      email: email,
+
+      password: password
+
+    };
+
+
+    localStorage.setItem(
+      "alvinAccount",
+      JSON.stringify(account)
+    );
+
+
+    localStorage.setItem(
+      "alvinUser",
+      JSON.stringify(account)
+    );
+
+
+    showToast(
+      "Account created successfully!"
+    );
+
+  }
+
+
+  authOverlay.classList.add("hidden");
+
+  authForm.reset();
+
+});
+
+
+/* Password visibility */
+
+togglePassword.addEventListener("click", function () {
+
+  if (passwordInput.type === "password") {
+
+    passwordInput.type = "text";
+
+    togglePassword.textContent = "🙈";
+
+  } else {
+
+    passwordInput.type = "password";
+
+    togglePassword.textContent = "👁";
+
+  }
+
+});
+
+
+/* =====================================================
+   THEME
+===================================================== */
+
+const savedTheme =
+  localStorage.getItem("alvinTheme");
+
+if (savedTheme === "light") {
+
+  document.body.classList.add("light");
+
+  themeBtn.textContent = "☀️";
+
+}
+
+
+themeBtn.addEventListener("click", function () {
+
+  document.body.classList.toggle("light");
+
+  const isLight =
+    document.body.classList.contains("light");
+
+  localStorage.setItem(
+    "alvinTheme",
+    isLight ? "light" : "dark"
+  );
+
+  themeBtn.textContent =
+    isLight ? "☀️" : "🌙";
+
+});
+
+
+/* =====================================================
+   PAGE NAVIGATION
+===================================================== */
+
+const navLinks =
+  document.querySelectorAll(".nav-link");
+
+const pages =
+  document.querySelectorAll(".page");
+
+
+function openPage(pageName) {
+
+  pages.forEach(function (page) {
+
+    page.classList.remove("active-page");
+
+  });
+
+
+  navLinks.forEach(function (link) {
+
+    link.classList.remove("active");
+
+  });
+
+
+  const target =
+    document.getElementById(pageName);
+
+  if (target) {
+
+    target.classList.add("active-page");
+
+  }
+
+
+  navLinks.forEach(function (link) {
+
+    if (link.dataset.page === pageName) {
+
+      link.classList.add("active");
+
+    }
+
+  });
+
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+}
+
+
+navLinks.forEach(function (link) {
+
+  link.addEventListener("click", function () {
+
+    openPage(link.dataset.page);
+
+  });
+
+});
+
+
+/* Feature cards */
+
+document
+  .querySelectorAll("[data-page-link]")
+  .forEach(function (card) {
+
+    card.addEventListener("click", function () {
+
+      openPage(card.dataset.pageLink);
+
+    });
+
+  });
+
+
+/* =====================================================
+   AI ANSWER ENGINE
+===================================================== */
+
+function generateAnswer(question) {
+
+  const q =
+    question.toLowerCase().trim();
+
+
+  /* Artificial Intelligence */
+
+  if (
+    q.includes("artificial intelligence") ||
+    q === "ai" ||
+    q.includes("what is ai")
+  ) {
+
+    return `
+      <h3 class="answer-title">
+        🤖 Artificial Intelligence
+      </h3>
+
+      <p>
+        Artificial Intelligence (AI) is a field of
+        computer science that enables machines to
+        perform tasks that normally require human
+        intelligence.
+      </p>
+
+      <p>
+        AI systems can learn from data, recognize
+        patterns, understand language, make
+        predictions and support decision-making.
+      </p>
+
+      <p>
+        <strong>Example:</strong>
+        A recommendation system on YouTube or Netflix
+        studies your previous activity and suggests
+        content you may like.
+      </p>
+
+      <p>
+        <strong>Simple definition:</strong>
+        AI means making computers capable of performing
+        intelligent tasks.
+      </p>
+    `;
+
+  }
+
+
+  /* Finance */
+
+  if (
+    q.includes("financial management") ||
+    q.includes("finance")
+  ) {
+
+    return `
+      <h3 class="answer-title">
+        💰 Financial Management
+      </h3>
+
+      <p>
+        Financial management is the planning,
+        organizing and controlling of financial
+        resources in an organization.
+      </p>
+
+      <p>
+        Its main objective is to use money efficiently
+        and increase the value of the business.
+      </p>
+
+      <p>
+        <strong>Major decisions include:</strong>
+      </p>
+
+      <ul>
+        <li>Investment decisions</li>
+        <li>Financing decisions</li>
+        <li>Dividend decisions</li>
+        <li>Working capital management</li>
+      </ul>
+
+      <p>
+        <strong>Example:</strong>
+        A company deciding whether to invest ₹10 lakh
+        in a new project is making an investment
+        decision.
+      </p>
+    `;
+
+  }
+
+
+  /* English */
+
+  if (
+    q.includes("english") ||
+    q.includes("speaking")
+  ) {
+
+    return `
+      <h3 class="answer-title">
+        🗣️ Improve Your English Speaking
+      </h3>
+
+      <p>
+        The best way to improve English speaking is
+        to practice a little every day.
+      </p>
+
+      <p>
+        <strong>Daily 20-minute routine:</strong>
+      </p>
+
+      <ul>
+        <li>5 minutes — learn new words</li>
+        <li>5 minutes — read aloud</li>
+        <li>5 minutes — speak about your day</li>
+        <li>5 minutes — listen and repeat</li>
+      </ul>
+
+      <p>
+        Don't worry about making mistakes.
+        Focus first on speaking clearly and
+        confidently.
+      </p>
+    `;
+
+  }
+
+
+  /* Marketing */
+
+  if (q.includes("marketing")) {
+
+    return `
+      <h3 class="answer-title">
+        📢 Marketing
+      </h3>
+
+      <p>
+        Marketing is the process of identifying
+        customer needs and creating, communicating
+        and delivering products or services that
+        satisfy those needs.
+      </p>
+
+      <p>
+        The traditional marketing mix is known as
+        the <strong>4Ps</strong>:
+      </p>
+
+      <ul>
+        <li>Product</li>
+        <li>Price</li>
+        <li>Place</li>
+        <li>Promotion</li>
+      </ul>
+
+      <p>
+        <strong>Example:</strong>
+        A company launching a new smartphone must
+        decide its features, price, distribution and
+        advertising strategy.
+      </p>
+    `;
+
+  }
+
+
+  /* Economics */
+
+  if (q.includes("economics")) {
+
+    return `
+      <h3 class="answer-title">
+        📈 Economics
+      </h3>
+
+      <p>
+        Economics is the study of how individuals,
+        businesses and governments use limited
+        resources to satisfy unlimited wants.
+      </p>
+
+      <p>
+        The two major branches are:
+      </p>
+
+      <ul>
+        <li><strong>Microeconomics</strong> — individuals,
+        firms and markets.</li>
+
+        <li><strong>Macroeconomics</strong> — inflation,
+        unemployment, GDP and economic growth.</li>
+      </ul>
+    `;
+
+  }
+
+
+  /* HR */
+
+  if (
+    q.includes("human resource") ||
+    q.includes("hr management")
+  ) {
+
+    return `
+      <h3 class="answer-title">
+        👥 Human Resource Management
+      </h3>
+
+      <p>
+        Human Resource Management (HRM) is the process
+        of managing people in an organization.
+      </p>
+
+      <p>
+        HR activities include recruitment, selection,
+        training, performance management, compensation
+        and employee development.
+      </p>
+
+      <p>
+        <strong>Example:</strong>
+        When a company recruits a new employee and
+        provides training, HRM is involved.
+      </p>
+    `;
+
+  }
+
+
+  /* Default answer */
+
+  return `
+    <h3 class="answer-title">
+      🔎 ALVIN understands your question
+    </h3>
+
+    <p>
+      You asked:
+      <strong>${escapeHTML(question)}</strong>
+    </p>
+
+    <p>
+      This is the built-in ALVIN learning engine.
+      It can provide structured explanations for
+      common learning topics.
+    </p>
+
+    <p>
+      Try asking about topics such as:
+    </p>
+
+    <ul>
+      <li>Artificial Intelligence</li>
+      <li>Financial Management</li>
+      <li>Marketing</li>
+      <li>Economics</li>
+      <li>Human Resource Management</li>
+      <li>English Speaking</li>
+    </ul>
+
+    <p>
+      <strong>Important:</strong>
+      For truly live answers to any question on the
+      internet, ALVIN needs to be connected to a real
+      AI/search API.
+    </p>
+  `;
+
+}
+
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+function performSearch(question) {
+
+  question =
+    question.trim();
+
+
+  if (!question) {
+
+    showToast(
+      "Please enter something to search."
+    );
+
+    return;
+  }
+
+
+  answerQuestion.textContent =
+    question;
+
+  answerText.innerHTML =
+    generateAnswer(question);
+
+  answerSection.classList.remove("hidden");
+
+
+  saveHistory(question);
+
+
+  setTimeout(function () {
+
+    answerSection.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+  }, 100);
+
+}
+
+
+searchBtn.addEventListener("click", function () {
+
+  performSearch(
+    searchInput.value
+  );
+
+});
+
+
+searchInput.addEventListener("keydown", function (event) {
+
+  if (event.key === "Enter") {
+
+    performSearch(
+      searchInput.value
+    );
+
+  }
+
+});
+
+
+/* Quick search buttons */
+
+document
+  .querySelectorAll("[data-search]")
+  .forEach(function (button) {
+
+    button.addEventListener("click", function () {
+
+      const query =
+        button.dataset.search;
+
+      searchInput.value =
+        query;
+
+      openPage("home");
+
+      performSearch(query);
+
+    });
+
+  });
+
+
+/* Clear answer */
+
+clearAnswer.addEventListener("click", function () {
+
+  answerSection.classList.add("hidden");
+
+  answerText.innerHTML = "";
+
+});
+
+
+/* =====================================================
+   HISTORY
+===================================================== */
+
+function getHistory() {
+
+  return JSON.parse(
+    localStorage.getItem("alvinHistory") || "[]"
+  );
+
+}
+
+
+function saveHistory(question) {
+
+  let history =
+    getHistory();
+
+
+  history =
+    history.filter(function (item) {
+
+      return item.question !== question;
+
+    });
+
+
+  history.unshift({
+
+    question: question,
+
+    time: new Date().toLocaleString()
+
+  });
+
+
+  history =
+    history.slice(0, 10);
+
+
+  localStorage.setItem(
+    "alvinHistory",
+    JSON.stringify(history)
+  );
+
+
+  renderHistory();
+
+}
+
+
+function renderHistory() {
+
+  const history =
+    getHistory();
+
+
+  if (!history.length) {
+
+    historyList.innerHTML = `
+      <div class="empty-state">
+        Your recent searches will appear here.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  historyList.innerHTML =
+    history.map(function (item) {
+
+      return `
+        <div
+          class="history-item"
+          data-history="${escapeHTML(item.question)}"
+        >
+
+          <span class="history-question">
+            🔎 ${escapeHTML(item.question)}
+          </span>
+
+          <span class="history-time">
+            ${escapeHTML(item.time)}
+          </span>
+
+        </div>
+      `;
+
+    }).join("");
+
+
+  document
+    .querySelectorAll(".history-item")
+    .forEach(function (item) {
+
+      item.addEventListener("click", function () {
+
+        const question =
+          item.dataset.history;
+
+        searchInput.value =
+          question;
+
+        openPage("home");
+
+        performSearch(question);
+
+      });
+
+    });
+
+}
+
+
+clearHistory.addEventListener("click", function () {
+
+  localStorage.removeItem(
+    "alvinHistory"
+  );
+
+  renderHistory();
+
+  showToast("Search history cleared.");
+
+});
+
+
+renderHistory();
+
+
+/* =====================================================
+   COPY ANSWER
+===================================================== */
+
+copyBtn.addEventListener("click", async function () {
+
+  const text =
+    answerText.innerText;
+
+
+  try {
+
+    await navigator.clipboard.writeText(text);
+
+    showToast(
+      "Answer copied!"
+    );
+
+  } catch (error) {
+
+    showToast(
+      "Copy failed. Please select the text."
+    );
+
+  }
+
+});
+
+
+/* =====================================================
+   TEXT TO SPEECH
+===================================================== */
+
+speakBtn.addEventListener("click", function () {
+
+  if (!("speechSynthesis" in window)) {
+
+    showToast(
+      "Text-to-speech is not supported."
+    );
+
+    return;
+  }
+
+
+  speechSynthesis.cancel();
+
+
+  const text =
+    answerText.innerText;
+
+
+  const speech =
+    new SpeechSynthesisUtterance(text);
+
+
+  speech.rate = 0.95;
+
+  speech.pitch = 1;
+
+
+  speechSynthesis.speak(
+    speech
+  );
+
+});
+
+
+/* =====================================================
+   VOICE SEARCH
+===================================================== */
+
+voiceBtn.addEventListener("click", function () {
+
+  const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+
+  if (!SpeechRecognition) {
+
+    showToast(
+      "Voice search is not supported in this browser."
+    );
+
+    return;
+  }
+
+
+  const recognition =
+    new SpeechRecognition();
+
+
+  recognition.lang =
+    "en-IN";
+
+  recognition.interimResults =
+    false;
+
+  recognition.continuous =
+    false;
+
+
+  voiceBtn.textContent =
+    "🔴";
+
+
+  recognition.start();
+
+
+  recognition.onresult =
+    function (event) {
+
+      const transcript =
+        event.results[0][0].transcript;
+
+      searchInput.value =
+        transcript;
+
+      performSearch(
+        transcript
+      );
+
+    };
+
+
+  recognition.onerror =
+    function () {
+
+      showToast(
+        "Voice search failed."
+      );
+
+    };
+
+
+  recognition.onend =
+    function () {
+
+      voiceBtn.textContent =
+        "🎙";
+
+    };
+
+});
+
+
+/* =====================================================
+   QUIZ
+===================================================== */
+
+const questions = [
+
+  {
+    question:
+      "What does AI stand for?",
+
+    options: [
+      "Artificial Intelligence",
+      "Automated Internet",
+      "Advanced Information",
+      "Artificial Internet"
+    ],
+
+    answer: 0
+  },
+
+
+  {
+    question:
+      "Which is a major financial management decision?",
+
+    options: [
+      "Investment decision",
+      "Weather decision",
+      "Food decision",
+      "Travel decision"
+    ],
+
+    answer: 0
+  },
+
+
+  {
+    question:
+      "What are the 4Ps of marketing?",
+
+    options: [
+      "Product, Price, Place, Promotion",
+      "People, Profit, Plan, Product",
+      "Price, People, Power, Plan",
+      "Product, People, Profit, Place"
+    ],
+
+    answer: 0
+  },
+
+
+  {
+    question:
+      "Which branch of economics studies individual firms and consumers?",
+
+    options: [
+      "Macroeconomics",
+      "Microeconomics",
+      "International economics",
+      "Public economics"
+    ],
+
+    answer: 1
+  },
+
+
+  {
+    question:
+      "What does HRM mainly focus on?",
+
+    options: [
+      "Machines",
+      "Buildings",
+      "People",
+      "Products"
+    ],
+
+    answer: 2
+  }
+
 ];
 
 
-/* =========================================================
-   100 QUIZ QUESTIONS
-   ========================================================= */
+let currentQuestion = 0;
 
-const quizData = [
-  ["What is the opposite of 'increase'?",["Decrease","Improve","Expand","Grow"],0],
-  ["What does 'accurate' mean?",["Correct","Fast","Large","Difficult"],0],
-  ["Which word means 'to examine carefully'?",["Analyze","Avoid","Forget","Create"],0],
-  ["What is NPV used for?",["Investment appraisal","Hiring","Marketing only","Payroll"],0],
-  ["What does ROI stand for?",["Return on Investment","Rate of Income","Risk of Investment","Return of Interest"],0],
-  ["Which market deals with new securities?",["Primary market","Secondary market","Money market","Retail market"],0],
-  ["What is inflation?",["General rise in prices","Fall in employment","Increase in exports","Fall in prices"],0],
-  ["What does communication mean?",["Sharing information","Saving money","Buying goods","Calculating tax"],0],
-  ["Which is a soft skill?",["Communication","Accounting equation","NPV","Balance sheet"],0],
-  ["What is a goal?",["A desired result","A problem","A loss","A document"],0],
-  ["Which word means 'reliable'?",["Trustworthy","Weak","Unclear","Temporary"],0],
-  ["What does MBA stand for?",["Master of Business Administration","Master of Banking Analysis","Management Business Account","Market Business Administration"],0],
-  ["Which is a financial statement?",["Balance Sheet","Timetable","Resume","Agenda"],0],
-  ["What does risk mean?",["Possibility of uncertain outcome","Guaranteed profit","Fixed salary","Tax"],0],
-  ["What is capital budgeting?",["Evaluating long-term investments","Daily attendance","Recruitment","Advertising"],0],
-  ["What is diversification?",["Spreading investments","Buying one stock","Avoiding investment","Taking loans"],0],
-  ["Which is an example of an asset?",["Cash","Salary expense","Loan interest","Rent expense"],0],
-  ["What is a liability?",["An obligation","A profit","An asset","Revenue"],0],
-  ["What is revenue?",["Income from business activities","Expense","Loan","Tax"],0],
-  ["What is profit?",["Revenue minus expenses","Expenses plus assets","Assets minus sales","Loans minus revenue"],0],
-  ["Which word means 'improve'?",["Enhance","Reduce","Withdraw","Ignore"],0],
-  ["What does proactive mean?",["Taking action early","Waiting always","Avoiding work","Ignoring problems"],0],
-  ["Which skill is useful in interviews?",["Communication","Silence","Avoiding questions","Late arrival"],0],
-  ["What is a budget?",["Financial plan","Loan document","Resume","Contract"],0],
-  ["What is saving?",["Setting aside money","Spending everything","Borrowing","Investing only"],0],
-  ["What is investment?",["Putting resources into something for future benefit","Spending without planning","Borrowing money","Paying tax"],0],
-  ["What is a stock?",["Ownership share in a company","Company loan","Salary","Expense"],0],
-  ["What is a bond?",["Debt instrument","Ownership share","Salary","Tax"],0],
-  ["What is liquidity?",["Ease of converting to cash","Profitability only","Debt level","Market size"],0],
-  ["What is an interest rate?",["Cost of borrowing money","Tax rate","Salary rate","Profit margin"],0],
-  ["What is financial management?",["Managing financial resources","Managing attendance","Recruiting staff","Designing products"],0],
-  ["What does 'allocate' mean?",["Distribute resources","Destroy resources","Borrow resources","Ignore resources"],0],
-  ["Which is an example of fixed cost?",["Rent","Raw material per unit","Sales commission","Packaging per unit"],0],
-  ["What is break-even point?",["Where total revenue equals total cost","Maximum profit","Minimum sales","Total assets"],0],
-  ["What is SWOT?",["Strengths Weaknesses Opportunities Threats","Sales Work Operations Tax","Strategy Work Organization Technology","Stock Wealth Opportunity Trade"],0],
-  ["What is a strength?",["Internal positive factor","External threat","External opportunity","Tax"],0],
-  ["What is an opportunity?",["External favorable factor","Internal weakness","Expense","Debt"],0],
-  ["What is behavioural finance?",["Study of psychology in financial decisions","Bank accounting","Tax calculation","Payroll"],0],
-  ["What can influence behavioural investors?",["Emotions and biases","Only formulas","Only laws","Only salaries"],0],
-  ["What is overconfidence?",["Excessive belief in one's ability","Fear of loss","Saving money","Diversification"],0],
-  ["What is diversification useful for?",["Reducing unsystematic risk","Increasing one-stock risk","Avoiding all losses","Guaranteeing profit"],0],
-  ["What is a portfolio?",["Collection of investments","Single loan","Salary slip","Tax form"],0],
-  ["What is a financial market?",["Market where financial assets are traded","Grocery market","Job market only","Housing only"],0],
-  ["What is a stock exchange?",["Organized securities marketplace","Bank account","Tax office","Insurance office"],0],
-  ["What is SEBI?",["Indian securities market regulator","Indian tax department","Central bank","Insurance company"],0],
-  ["What is RBI?",["India's central bank","Stock exchange","Insurance regulator","Tax authority"],0],
-  ["What does GST relate to?",["Goods and Services Tax","Government Salary Transfer","General Sales Trade","Growth Service Tax"],0],
-  ["What is an entrepreneur?",["Person who starts or manages a business venture","Employee only","Customer","Auditor"],0],
-  ["What is leadership?",["Ability to guide and influence others","Avoiding responsibility","Only giving orders","Working alone"],0],
-  ["What is teamwork?",["Working together toward a goal","Competing always","Working alone","Avoiding communication"],0],
-  ["What is time management?",["Planning and controlling time","Working without breaks","Ignoring deadlines","Doing everything randomly"],0],
-  ["What is productivity?",["Useful output relative to resources","Salary only","Attendance","Office size"],0],
-  ["What is innovation?",["Introducing useful new ideas","Copying everything","Avoiding change","Reducing quality"],0],
-  ["What is strategy?",["Long-term plan to achieve goals","Daily expense","Salary","Tax"],0],
-  ["What is a target market?",["Specific customer group","Company employees only","Government only","Suppliers only"],0],
-  ["What is marketing?",["Creating and delivering value to customers","Accounting only","Recruitment only","Tax filing"],0],
-  ["What is customer satisfaction?",["How well customer expectations are met","Company profit only","Employee salary","Tax payment"],0],
-  ["What is demand?",["Quantity consumers are willing to buy","Company supply only","Profit only","Tax"],0],
-  ["What is supply?",["Quantity producers offer","Consumer demand only","Salary","Profit"],0],
-  ["What is GDP?",["Value of goods and services produced in an economy","Government debt only","Bank profit","Tax revenue"],0],
-  ["What is unemployment?",["People willing and able to work but without jobs","People working overtime","Students only","Retired people only"],0],
-  ["What is economic growth?",["Increase in economic output","Fall in production","Increase in unemployment only","Fall in income"],0],
-  ["What is a recession?",["Significant decline in economic activity","Rapid growth","High employment","Market expansion"],0],
-  ["What is a budget deficit?",["Expenses exceed revenue","Revenue exceeds expenses","No expenses","No revenue"],0],
-  ["What is a surplus?",["Revenue exceeds expenses","Expenses exceed revenue","Debt only","Loss"],0],
-  ["What is credit?",["Ability to borrow with repayment obligation","Cash gift","Profit","Tax"],0],
-  ["What is a loan?",["Borrowed money to be repaid","Investment return","Salary","Asset only"],0],
-  ["What is collateral?",["Asset pledged to secure a loan","Salary","Profit","Tax"],0],
-  ["What is insurance?",["Protection against specified risks","Guaranteed profit","Loan","Investment only"],0],
-  ["What is a premium?",["Amount paid for insurance coverage","Loan principal","Profit","Tax"],0],
-  ["What is a mutual fund?",["Pooled investment vehicle","Bank loan","Insurance policy","Tax"],0],
-  ["What is NAV?",["Net Asset Value","New Account Value","National Asset Verification","Net Annual Volume"],0],
-  ["What is an index?",["Measure representing a group of securities","Single company only","Loan document","Tax"],0],
-  ["What is Sensex?",["BSE benchmark index","Bank loan","Insurance index","Tax index"],0],
-  ["What is Nifty 50?",["NSE benchmark index","BSE bond","Bank index only","Insurance scheme"],0],
-  ["What is a dividend?",["Distribution of company profit to shareholders","Loan payment","Tax refund","Salary"],0],
-  ["What is market capitalization?",["Value of a company's outstanding shares","Annual salary","Total expenses","Loan amount"],0],
-  ["What is P/E ratio?",["Price-to-Earnings ratio","Profit-to-Expense ratio","Price-to-Equity only","Payment-to-Earnings"],0],
-  ["What is a bull market?",["Market with generally rising prices","Falling market","Closed market","No trading"],0],
-  ["What is a bear market?",["Market with generally falling prices","Rising market","Closed market","No investment"],0],
-  ["What is volatility?",["Degree of price fluctuation","Fixed return","Tax rate","Salary growth"],0],
-  ["What is a derivative?",["Financial contract whose value derives from an underlying asset","Bank account","Salary","Tax"],0],
-  ["What is a forward contract?",["Agreement to transact in future at agreed terms","Immediate cash sale only","Insurance policy","Equity share"],0],
-  ["What is a futures contract?",["Standardized exchange-traded agreement","Salary contract","Loan only","Insurance only"],0],
-  ["What is an option?",["Right but not obligation to buy or sell","Mandatory purchase","Loan","Tax"],0],
-  ["What is a call option?",["Right to buy","Right to sell","Mandatory sale","Loan"],0],
-  ["What is a put option?",["Right to sell","Right to buy","Mandatory purchase","Dividend"],0],
-  ["What is hedging?",["Reducing risk using financial strategies","Increasing risk intentionally","Avoiding accounting","Increasing taxes"],0],
-  ["What is arbitrage?",["Seeking profit from price differences","Long-term saving only","Tax planning","Budgeting"],0],
-  ["What is WACC?",["Weighted Average Cost of Capital","Working Asset Capital Cost","Weighted Annual Cash Cost","Working Average Credit Capital"],0],
-  ["What is cost of capital?",["Required return/cost associated with financing","Salary","Tax only","Revenue"],0],
-  ["What is debt financing?",["Raising funds through borrowing","Selling ownership only","Saving cash","Reducing assets"],0],
-  ["What is equity financing?",["Raising funds by selling ownership","Borrowing only","Tax payment","Expense"],0],
-  ["What is leverage?",["Use of fixed costs or debt to magnify returns and risk","Saving money","Diversification only","Insurance"],0],
-  ["What is cash flow?",["Movement of cash into and out of a business","Profit only","Revenue only","Asset value"],0],
-  ["What is working capital?",["Current assets minus current liabilities","Fixed assets minus debt","Revenue minus tax","Profit minus salary"],0],
-  ["What is a current asset?",["Asset expected to convert to cash/use within short term","Long-term building only","Lon
+let quizScore = 0;
+
+let selectedAnswer = null;
+
+
+const questionNumber =
+  document.getElementById("questionNumber");
+
+const scoreElement =
+  document.getElementById("score");
+
+const questionText =
+  document.getElementById("questionText");
+
+const quizOptions =
+  document.getElementById("quizOptions");
+
+const nextQuestion =
+  document.getElementById("nextQuestion");
+
+const quizProgress =
+  document.getElementById("quizProgress");
+
+
+function loadQuestion() {
+
+  const question =
+    questions[currentQuestion];
+
+
+  selectedAnswer =
+    null;
+
+
+  questionNumber.textContent =
+    `Question ${currentQuestion + 1} / ${questions.length}`;
+
+
+  scoreElement.textContent =
+    `Score: ${quizScore}`;
+
+
+  questionText.textContent =
+    question.
